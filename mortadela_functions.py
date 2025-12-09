@@ -105,13 +105,13 @@ def calculate_coordinates_if_maldi_topleft_is_00_final(big_template, template, a
     Returns:
         Rotated coordinates of the four corners
     """
-    plt.imshow(cv2.cvtColor(big_template, cv2.COLOR_BGR2RGB), aspect='equal')
-    plt.axis('off')
+    # plt.imshow(cv2.cvtColor(big_template, cv2.COLOR_BGR2RGB), aspect='equal')
+    # plt.axis('off')
 
-    plt.plot(0, 0, 'ro')  #maldi top left
-    plt.plot(big_template.shape[1], 0, 'ro')  #maldi bottom left
-    plt.plot(0, big_template.shape[0], 'ro')  #maldi top right
-    plt.plot(big_template.shape[1], big_template.shape[0], 'ro')  #maldi bottom right
+    # plt.plot(0, 0, 'ro')  #maldi top left
+    # plt.plot(big_template.shape[1], 0, 'ro')  #maldi bottom left
+    # plt.plot(0, big_template.shape[0], 'ro')  #maldi top right
+    # plt.plot(big_template.shape[1], big_template.shape[0], 'ro')  #maldi bottom right
     
     template_top_left = (0, 0)
     template_top_right = (template.shape[1], 0)
@@ -121,17 +121,17 @@ def calculate_coordinates_if_maldi_topleft_is_00_final(big_template, template, a
     # plt.plot(template_top_right[0] + biggest_add//2, template_top_right[1] + biggest_add//2, 'go')  #template top right
     # plt.plot(template_bottom_left[0] + biggest_add//2, template_bottom_left[1] + biggest_add//2, 'go')  #template bottom left
     # plt.plot(template_bottom_right[0] + biggest_add//2, template_bottom_right[1] + biggest_add//2, 'go')  #template bottom right
-    plt.plot(biggest_add//2, biggest_add//2, 'go')  #template top left
-    plt.plot(big_template.shape[1] - biggest_add//2, 0 + biggest_add//2, 'go')  #template top right
-    plt.plot(0 + biggest_add//2, big_template.shape[0] - biggest_add//2, 'go')  #template bottom left
-    plt.plot(big_template.shape[1] - biggest_add//2, big_template.shape[0] - biggest_add//2, 'go')  #template bottom right
+    # plt.plot(biggest_add//2, biggest_add//2, 'go')  #template top left
+    # plt.plot(big_template.shape[1] - biggest_add//2, 0 + biggest_add//2, 'go')  #template top right
+    # plt.plot(0 + biggest_add//2, big_template.shape[0] - biggest_add//2, 'go')  #template bottom left
+    # plt.plot(big_template.shape[1] - biggest_add//2, big_template.shape[0] - biggest_add//2, 'go')  #template bottom right
 
 
-    plt.show()
+    # plt.show()
 
-    plt.close()
-    print(f"big_template.shape: {big_template.shape}")
-    print(f"template.shape: {template.shape}")
+    # plt.close()
+    # print(f"big_template.shape: {big_template.shape}")
+    # print(f"template.shape: {template.shape}")
 
     ox, oy = big_template.shape[1] // 2, big_template.shape[0] // 2
 
@@ -191,10 +191,10 @@ def process_images(sample_name, directory, template_pixel_size, maldi_pixel_size
     template_original = cv2.imread(f'{directory}/{sample_name}/{sample_name}.png')  # Base image in color
     template_BW_original = cv2.imread(f'{directory}/{sample_name}/{sample_name}.png', cv2.IMREAD_GRAYSCALE)  # Base image in grayscale
     maldi_o = cv2.imread(f'{directory}/{sample_name}/{sample_name}_TIC.png', cv2.IMREAD_GRAYSCALE)  # Overlay image in grayscale
-    plt.imshow(maldi_o, cmap='gray')
-    plt.axis('off')
-    plt.show()
-    plt.close()
+    # plt.imshow(maldi_o, cmap='gray')
+    # plt.axis('off')
+    # plt.show()
+    # plt.close()
 
 
     ####### fusió de 3 maldi images ########
@@ -645,16 +645,14 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         else:
             overlay_loc = max_loc
 
-        os.makedirs(f"{directory}/outputs/{sample_name}_30", exist_ok=True)
-        os.makedirs(f"{directory}/outputs/{sample_name}_30/gifs", exist_ok=True)
+        os.makedirs(f"{directory}/outputs/{sample_name}", exist_ok=True)
+        os.makedirs(f"{directory}/outputs/{sample_name}/gifs", exist_ok=True)
 
         # Create GIF animation
-        gif_path = f"{directory}/outputs/{sample_name}_30/gifs/{sample_name}_{meth}.gif"
+        gif_path = f"{directory}/outputs/{sample_name}/gifs/{sample_name}_{meth}.gif"
         create_overlay_gif_with_title(template.copy(), maldi.copy(), overlay_loc, gif_path, f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'",
                           alpha_steps=alpha_steps, duration=frame_duration)
         
-        # Also create final PNG with alpha=0.7 (optional)
-
 
         # Also create final PNG with alpha=0.7 (optional)
         template_with_overlay1 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
@@ -662,7 +660,8 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         plt.imshow(cv2.cvtColor(template_with_overlay1, cv2.COLOR_BGR2RGB))
         plt.axis('off')
         plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
-        plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
+        plt.savefig(f"{directory}/outputs/{sample_name}/{sample_name}_{meth}.png", bbox_inches='tight')
+        plt.show()
         plt.close()  # Important: close the figure to free memory
         
         print(f"{meth} done - GIF and PNG created")
@@ -674,8 +673,8 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
 
         template_with_overlay1 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
         # plt.figure(figsize=(10, 8))
-        plt.imshow(cv2.cvtColor(template_with_overlay1, cv2.COLOR_BGR2RGB), aspect='equal')
-        plt.axis('off')
+        # plt.imshow(cv2.cvtColor(template_with_overlay1, cv2.COLOR_BGR2RGB), aspect='equal')
+        # plt.axis('off')
         # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
         # plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
         #put a red dot on overlay_loc
@@ -695,23 +694,23 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         maldi_x_displ = (maldi_o_rot.shape[0] - maldi_o.shape[0]) // 2
         maldi_y_displ = (maldi_o_rot.shape[1] - maldi_o.shape[1]) // 2
 
-        plt.plot(overlay_loc[0] + maldi_x_displ, overlay_loc[1] + maldi_y_displ, 'ro')  #maldi top left
-        plt.plot(template_with_overlay1.shape[0] - overlay_loc[0]- maldi_x_displ, overlay_loc[1]+ maldi_y_displ, 'ro')  #
-        plt.plot([0, template_with_overlay1.shape[0]], [0, 0], 'r-')
-        plt.plot([0, 0], [0, template_with_overlay1.shape[1]], 'r-')
-        plt.plot([template_with_overlay1.shape[0], template_with_overlay1.shape[0]], [0, template_with_overlay1.shape[1]], 'r-')
-        plt.plot([0, template_with_overlay1.shape[0]], [template_with_overlay1.shape[1], template_with_overlay1.shape[1]], 'r-')
+        # plt.plot(overlay_loc[0] + maldi_x_displ, overlay_loc[1] + maldi_y_displ, 'ro')  #maldi top left
+        # plt.plot(template_with_overlay1.shape[0] - overlay_loc[0]- maldi_x_displ, overlay_loc[1]+ maldi_y_displ, 'ro')  #
+        # plt.plot([0, template_with_overlay1.shape[0]], [0, 0], 'r-')
+        # plt.plot([0, 0], [0, template_with_overlay1.shape[1]], 'r-')
+        # plt.plot([template_with_overlay1.shape[0], template_with_overlay1.shape[0]], [0, template_with_overlay1.shape[1]], 'r-')
+        # plt.plot([0, template_with_overlay1.shape[0]], [template_with_overlay1.shape[1], template_with_overlay1.shape[1]], 'r-')
 
-        plt.show()
+        # plt.show()
 
-        plt.close()  # Important: close the figure to free memory
+        # plt.close()  # Important: close the figure to free memory
         
-        print(f"{meth} done - GIF and PNG created")
+        # print(f"{meth} done - GIF and PNG created")
 
         # template_with_overlay1 = overlay_images_alpha(maldi.copy(), template.copy(), overlay_loc, 0.7)
         
 
-        print( f"overlay_loc[0]: {overlay_loc[0]}, overlay_loc[1]: {overlay_loc[1]}, template.shape[1]//2: {template.shape[1]//2}, template.shape[0]//2: {template.shape[0]//2}, angle: {angle}, flip: {flip}" )
+        # print( f"overlay_loc[0]: {overlay_loc[0]}, overlay_loc[1]: {overlay_loc[1]}, template.shape[1]//2: {template.shape[1]//2}, template.shape[0]//2: {template.shape[0]//2}, angle: {angle}, flip: {flip}" )
 
         # if flip:
         #     x, y = rotate_point_manual(template_with_overlay1.shape[0] - overlay_loc[0] - biggest_add//2 - maldi_x_displ, overlay_loc[1]+ maldi_y_displ,
@@ -726,29 +725,29 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
             template_x_displ = (template_with_overlay1.shape[0] - test.shape[0]) // 2
             template_y_displ = (template_with_overlay1.shape[1] - test.shape[1]) // 2
             # plt.figure(figsize=(10, 8))
-            plt.imshow(cv2.cvtColor(test, cv2.COLOR_BGR2RGB), aspect='equal')
-            plt.axis('off')
-            plt.plot(test.shape[0] - overlay_loc[0], overlay_loc[1]+ maldi_y_displ -biggest_add//2, 'ro')
-            # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
-            # plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
-            # plt.plot(x, y, 'ro')  #
-            plt.plot([0, template_with_overlay1.shape[0]], [0, 0], 'r-')
-            plt.plot([0, 0], [0, template_with_overlay1.shape[1]], 'r-')
-            plt.plot([template_with_overlay1.shape[0], template_with_overlay1.shape[0]], [0, template_with_overlay1.shape[1]], 'r-')
-            plt.plot([0, template_with_overlay1.shape[0]], [template_with_overlay1.shape[1], template_with_overlay1.shape[1]], 'r-')
+            # plt.imshow(cv2.cvtColor(test, cv2.COLOR_BGR2RGB), aspect='equal')
+            # plt.axis('off')
+            # plt.plot(test.shape[0] - overlay_loc[0], overlay_loc[1]+ maldi_y_displ -biggest_add//2, 'ro')
+            # # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
+            # # plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
+            # # plt.plot(x, y, 'ro')  #
+            # plt.plot([0, template_with_overlay1.shape[0]], [0, 0], 'r-')
+            # plt.plot([0, 0], [0, template_with_overlay1.shape[1]], 'r-')
+            # plt.plot([template_with_overlay1.shape[0], template_with_overlay1.shape[0]], [0, template_with_overlay1.shape[1]], 'r-')
+            # plt.plot([0, template_with_overlay1.shape[0]], [template_with_overlay1.shape[1], template_with_overlay1.shape[1]], 'r-')
 
-            #do the same for the inner maldi
-            # plt.plot([overlay_loc[0], overlay_loc[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1]], 'b-')  # Top edge
-            # plt.plot([overlay_loc[0], overlay_loc[1]], [overlay_loc[0], overlay_loc[1] + maldi.shape[1]], 'b-')  # Left edge
-            # plt.plot([overlay_loc[0], overlay_loc[1] + maldi.shape[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1] + maldi.shape[1]], 'b-')  # Bottom edge     
-            # plt.plot([overlay_loc[0] + maldi.shape[0], overlay_loc[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1] + maldi.shape[ 1]], 'b-')  # Right edge
-            plt.show()
-            plt.close()  # Im
+            # #do the same for the inner maldi
+            # # plt.plot([overlay_loc[0], overlay_loc[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1]], 'b-')  # Top edge
+            # # plt.plot([overlay_loc[0], overlay_loc[1]], [overlay_loc[0], overlay_loc[1] + maldi.shape[1]], 'b-')  # Left edge
+            # # plt.plot([overlay_loc[0], overlay_loc[1] + maldi.shape[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1] + maldi.shape[1]], 'b-')  # Bottom edge     
+            # # plt.plot([overlay_loc[0] + maldi.shape[0], overlay_loc[1]], [overlay_loc[0] + maldi.shape[0], overlay_loc[1] + maldi.shape[ 1]], 'b-')  # Right edge
+            # plt.show()
+            # plt.close()  # Im
         else:
             test = template_with_overlay1.copy()
         # test1 = rotate_image(test.copy(), -angle)
-        print(f"maldi_o shape[0]: {maldi_o.shape[0]}, maldi_o shape[1]: {maldi_o.shape[1]}")
-        print(f"maldi_o_rot shape[0]: {maldi_o_rot.shape[0]}, maldi_o_rot shape[1]: {maldi_o_rot.shape[1]}")
+        # print(f"maldi_o shape[0]: {maldi_o.shape[0]}, maldi_o shape[1]: {maldi_o.shape[1]}")
+        # print(f"maldi_o_rot shape[0]: {maldi_o_rot.shape[0]}, maldi_o_rot shape[1]: {maldi_o_rot.shape[1]}")
         maldi_tl = (test.shape[0] - overlay_loc[0], overlay_loc[1]+ maldi_y_displ -biggest_add//2)
         
         #get points relative to maldi
@@ -757,40 +756,40 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         test1 = np.ones((test.shape[1]*2, test.shape[0]*2 , 3), dtype=np.uint8) * 255
         x = maldi_tl_rot[0], maldi_tl_rot[1]
         y = maldi_tl_rot[0], maldi_tl_rot[1]
-        plt.imshow(test1)
-        plt.axis('off')
-        plt.plot(maldi_tl_rot[0], maldi_tl_rot[1], 'ro')  #maldi top left
-        plt.plot(maldi_tl_rot[0] + maldi_o.shape[0], maldi_tl_rot[1], 'ro')  #
-        plt.plot(maldi_tl_rot[0], maldi_tl_rot[1] + maldi_o.shape[1], 'ro')  #
-        plt.plot(maldi_tl_rot[0] + maldi_o.shape[0], maldi_tl_rot[1] + maldi_o.shape[1], 'ro')
+        # plt.imshow(test1)
+        # plt.axis('off')
+        # plt.plot(maldi_tl_rot[0], maldi_tl_rot[1], 'ro')  #maldi top left
+        # plt.plot(maldi_tl_rot[0] + maldi_o.shape[0], maldi_tl_rot[1], 'ro')  #
+        # plt.plot(maldi_tl_rot[0], maldi_tl_rot[1] + maldi_o.shape[1], 'ro')  #
+        # plt.plot(maldi_tl_rot[0] + maldi_o.shape[0], maldi_tl_rot[1] + maldi_o.shape[1], 'ro')
 
-        plt.plot(template_tl[0], template_tl[1], 'bo')  #template top left
-        plt.plot(template_tr[0], template_tr[1], 'bo')  #template top right
-        plt.plot(template_bl[0], template_bl[1], 'bo')  #template bottom left
-        plt.plot(template_br[0], template_br[1], 'bo')  #template bottom right
-        # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
-        plt.show()
-        plt.close()  # Important: close the figure to free memory
+        # plt.plot(template_tl[0], template_tl[1], 'bo')  #template top left
+        # plt.plot(template_tr[0], template_tr[1], 'bo')  #template top right
+        # plt.plot(template_bl[0], template_bl[1], 'bo')  #template bottom left
+        # plt.plot(template_br[0], template_br[1], 'bo')  #template bottom right
+        # # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
+        # plt.show()
+        # plt.close()  # Important: close the figure to free memory
         
         
         test = rotate_image(test.copy(), -angle)
-        print(f"test shape[0]: {test.shape[0]}, test shape[1]: {test.shape[1]}")
+        # print(f"test shape[0]: {test.shape[0]}, test shape[1]: {test.shape[1]}")
         # plt.figure(figsize=(8, 10))
-        plt.imshow(cv2.cvtColor(test, cv2.COLOR_BGR2RGB))#, aspect='equal')
-        plt.axis('off')
-        # plt.gca().set_aspect('equal')
-        # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
-        # plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
-        # plt.plot(x, y, 'ro')  #
-        # plt.plot([0, test.shape[0]], [0, 0], 'r-')
-        # plt.plot([0, 0], [0, test.shape[1]], 'r-')
-        # plt.plot([test.shape[0], test.shape[0]], [0, test.shape[1]], 'r-')
-        # plt.plot([0, test.shape[0]], [test.shape[1], test.shape[1]], 'r-')
-        plt.show()
-        plt.close()  # Important: close the figure to free memory
+        # plt.imshow(cv2.cvtColor(test, cv2.COLOR_BGR2RGB))#, aspect='equal')
+        # plt.axis('off')
+        # # plt.gca().set_aspect('equal')
+        # # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
+        # # plt.savefig(f"{directory}/outputs/{sample_name}_30/{sample_name}_{meth}.png", bbox_inches='tight')
+        # # plt.plot(x, y, 'ro')  #
+        # # plt.plot([0, test.shape[0]], [0, 0], 'r-')
+        # # plt.plot([0, 0], [0, test.shape[1]], 'r-')
+        # # plt.plot([test.shape[0], test.shape[0]], [0, test.shape[1]], 'r-')
+        # # plt.plot([0, test.shape[0]], [test.shape[1], test.shape[1]], 'r-')
+        # plt.show()
+        # plt.close()  # Important: close the figure to free memory
 
 
-        print("la bona")
+        # print("la bona")
         maldi = maldi_o.copy()
         template_BW = cv2.flip(template_BW.copy(), 1) if flip else template_BW.copy()
         # remove_border(template_with_overlay1, biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2)
@@ -836,15 +835,22 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         plt.plot(overlay_loc[0] + maldi.shape[1], overlay_loc[1] + maldi.shape[0], 'ro')
 
         plt.plot(template_tl_o[0], template_tl_o[1], 'bo')  #template top left
-        plt.plot(template_tr_o[0], template_tr_o[1], 'bo')  #template top right
-        plt.plot(template_bl_o[0], template_bl_o[1], 'bo')  #template bottom left
-        plt.plot(template_br_o[0], template_br_o[1], 'bo')  #template bottom right
+        plt.plot(template_tr_o[0], template_tr_o[1], 'go')  #template top right
+        plt.plot(template_bl_o[0], template_bl_o[1], 'yo')  #template bottom left
+        plt.plot(template_br_o[0], template_br_o[1], 'ko')  #template bottom right
         # plt.plot(0,0, 'go')  #origin
         # plt.plot([0, template_with_overlay1.shape[0]], [0, 0], 'r-')
         # plt.plot([0, 0], [0, template_with_overlay1.shape[1]], 'r-')
         # plt.plot([template_with_overlay1.shape[0], template_with_overlay1.shape[0]], [0, template_with_overlay1.shape[1]], 'r-')
         # plt.plot([0, template_with_overlay1.shape[0]], [template_with_overlay1.shape[1], template_with_overlay1.shape[1]], 'r-')
 
+        maldi_tl_final = (overlay_loc[0], overlay_loc[1])
+        maldi_tr_final = (overlay_loc[0] + maldi.shape[1], overlay_loc[1])
+        maldi_bl_final = (overlay_loc[0], overlay_loc[1] + maldi.shape[0])
+        maldi_br_final = (overlay_loc[0] + maldi.shape[1], overlay_loc[1] + maldi.shape[0])
+
+        transform_coordinates(maldi_tl_final, maldi_tr_final, maldi_bl_final, maldi_br_final,
+                              template_tl_o, template_tr_o, template_bl_o, template_br_o)
 
 
         plt.show()
@@ -855,7 +861,7 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
 
 
 
-        exit(1)
+        exit(0)
 
 
 # def rotate_point_manual(x, y, center_x, center_y, angle_degrees, scale=1.0):
@@ -907,3 +913,15 @@ def remove_border(image, top, bottom, left, right):
     
     return cropped
 
+def transform_coordinates(maldi_tl, maldi_tr, maldi_bl, maldi_br,
+                          template_tl, template_tr, template_bl, template_br):
+    """
+    Print the transformation coordinates taking into account maldi TL is (0,0)
+    """
+    maldi_tl_new = (0, 0)
+    maldi_tr_new = (maldi_tr[0] - maldi_tl[0], 0)
+    maldi_bl_new = (0, maldi_bl[1] - maldi_tl[1])
+    maldi_br_new = (maldi_br[0] - maldi_bl[0], maldi_br[1] - maldi_tr[1])
+    # template_tl_
+    print("Transformation Coordinates:")
+ 
