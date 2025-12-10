@@ -238,9 +238,9 @@ def process_images(sample_name, directory, template_pixel_size, maldi_pixel_size
 
 
     maldi_o = fused_image.copy()
-    plt.imshow(maldi_o, cmap='gray')
-    plt.axis('off')
-    plt.show()
+    # plt.imshow(maldi_o, cmap='gray')
+    # plt.axis('off')
+    # plt.show()
     # exit(1)
 
     # _, maldi_o = cv2.threshold(maldi_o.copy(), 0, 255, cv2.THRESH_OTSU)
@@ -478,7 +478,7 @@ def create_overlay_gif_with_title2(maldi, output_path, alpha_steps=360, duration
     return frames
 
 
-def create_overlay_gif_with_title(template, maldi, max_loc, output_path, title_text, alpha_steps=20, duration=100):
+def create_overlay_gif(template, maldi, max_loc, output_path, alpha_steps=20, duration=100):
     """
     Create a GIF showing the overlay animation from alpha 0 to 0.7 with title on each frame
     
@@ -505,8 +505,8 @@ def create_overlay_gif_with_title(template, maldi, max_loc, output_path, title_t
         pil_frame = Image.fromarray(frame_rgb.astype(np.uint8))
         
         # Add title to the frame
-        pil_frame_with_title = add_title_to_image(pil_frame, title_text)
-        frames.append(pil_frame_with_title)
+        # pil_frame_with_title = add_title_to_image(pil_frame, title_text)
+        frames.append(pil_frame)
     
     # Save as GIF
     frames[0].save(
@@ -645,26 +645,26 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         else:
             overlay_loc = max_loc
 
-        os.makedirs(f"{directory}/outputs/{sample_name}", exist_ok=True)
-        os.makedirs(f"{directory}/outputs/{sample_name}/gifs", exist_ok=True)
+        # os.makedirs(f"{directory}/outputs/{sample_name}", exist_ok=True)
+        # os.makedirs(f"{directory}/outputs/{sample_name}/gifs", exist_ok=True)
 
-        # Create GIF animation
-        gif_path = f"{directory}/outputs/{sample_name}/gifs/{sample_name}_{meth}.gif"
-        create_overlay_gif_with_title(template.copy(), maldi.copy(), overlay_loc, gif_path, f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'",
-                          alpha_steps=alpha_steps, duration=frame_duration)
+        # # Create GIF animation
+        # gif_path = f"{directory}/outputs/{sample_name}/gifs/{sample_name}_{meth}.gif"
+        # create_overlay_gif_with_title(template.copy(), maldi.copy(), overlay_loc, gif_path, f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'",
+        #                   alpha_steps=alpha_steps, duration=frame_duration)
         
 
-        # Also create final PNG with alpha=0.7 (optional)
-        template_with_overlay1 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
-        # plt.figure(figsize=(10, 8))
-        plt.imshow(cv2.cvtColor(template_with_overlay1, cv2.COLOR_BGR2RGB))
-        plt.axis('off')
-        plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
-        plt.savefig(f"{directory}/outputs/{sample_name}/{sample_name}_{meth}.png", bbox_inches='tight')
-        plt.show()
-        plt.close()  # Important: close the figure to free memory
+        # # Also create final PNG with alpha=0.7 (optional)
+        # template_with_overlay1 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
+        # # plt.figure(figsize=(10, 8))
+        # plt.imshow(cv2.cvtColor(template_with_overlay1, cv2.COLOR_BGR2RGB))
+        # plt.axis('off')
+        # plt.title(f"method: {meth}, angle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}'")
+        # plt.savefig(f"{directory}/outputs/{sample_name}/{sample_name}_{meth}.png", bbox_inches='tight')
+        # plt.show()
+        # plt.close()  # Important: close the figure to free memory
         
-        print(f"{meth} done - GIF and PNG created")
+        # print(f"{meth} done - GIF and PNG created")
 
 
 
@@ -831,13 +831,41 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         print(f"Final location: {overlay_loc}")
 
         template = cv2.resize(template_original.copy(), (0, 0), fx=resize, fy=resize)
-        template = cv2.copyMakeBorder(template.copy(), biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2, cv2.BORDER_CONSTANT, value=255)
+        template = cv2.copyMakeBorder(template.copy(), biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2, cv2.BORDER_CONSTANT, value=(255, 255, 255))
  
         template = rotate_image(template.copy(), angle)
 
         template = cv2.flip(template.copy(), 1) if flip else template.copy()
  
         template_with_overlay2 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
+
+
+
+
+
+
+
+
+
+        os.makedirs(f"{directory}/outputs/{sample_name}", exist_ok=True)
+        os.makedirs(f"{directory}/outputs/{sample_name}/gifs", exist_ok=True)
+
+        # Create GIF animation
+        gif_path = f"{directory}/outputs/{sample_name}/gifs/{sample_name}_{meth}.gif"
+        create_overlay_gif(template.copy(), maldi.copy(), overlay_loc, gif_path,
+                          alpha_steps=alpha_steps, duration=frame_duration)
+        
+
+        # Also create final PNG with alpha=0.7 (optional)
+        # plt.figure(figsize=(10, 8))
+        plt.imshow(cv2.cvtColor(template_with_overlay2, cv2.COLOR_BGR2RGB))
+        plt.axis('off')
+        plt.title(f"sample: {sample_name}, method: {meth}, \nangle: {angle}, flip: {flip}, resize: {resize:.3f}, location: {overlay_loc}")
+        plt.savefig(f"{directory}/outputs/{sample_name}/{sample_name}_{meth}.png", bbox_inches='tight')
+        # plt.show()
+        # plt.close()  # Important: close the figure to free memory
+        
+        print(f"{meth} done - GIF and PNG created")
 
         
         # plt.plot(overlay_loc[0], overlay_loc[1], 'ro')  #maldi top left
@@ -855,15 +883,15 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         template_tl_o, template_tr_o, template_bl_o, template_br_o, = calculate_coordinates_if_maldi_topleft_is_00_final(template_with_overlay1_copy.copy(), template_original.copy(), angle, biggest_add)
         
         
-        plt.imshow(cv2.cvtColor(template_with_overlay2, cv2.COLOR_BGR2RGB), aspect='equal')
-        plt.axis('off')
+        # plt.imshow(cv2.cvtColor(template_with_overlay2, cv2.COLOR_BGR2RGB), aspect='equal')
+        # plt.axis('off')
 
         plt.plot(overlay_loc[0], overlay_loc[1], 'ro')  #maldi top left
         plt.plot(overlay_loc[0] + maldi.shape[1], overlay_loc[1], 'ro')  #
         plt.plot(overlay_loc[0], overlay_loc[1] + maldi.shape[0], 'ro')  #
         plt.plot(overlay_loc[0] + maldi.shape[1], overlay_loc[1] + maldi.shape[0], 'ro')
 
-        plt.plot(template_tl_o[0], template_tl_o[1], 'wo')  #template top left
+        plt.plot(template_tl_o[0], template_tl_o[1], 'bo')  #template top left
         plt.plot(template_tr_o[0], template_tr_o[1], 'go')  #template top right
         plt.plot(template_bl_o[0], template_bl_o[1], 'yo')  #template bottom left
         plt.plot(template_br_o[0], template_br_o[1], 'ko')  #template bottom right
@@ -879,7 +907,8 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         maldi_br_final = (overlay_loc[0] + maldi.shape[1], overlay_loc[1] + maldi.shape[0])
 
         transform_coordinates(maldi_tl_final, maldi_tr_final, maldi_bl_final, maldi_br_final,
-                              template_tl_o, template_tr_o, template_bl_o, template_br_o)
+                              template_tl_o, template_tr_o, template_bl_o, template_br_o, 
+                              directory, sample_name, meth)
 
 
         plt.show()
@@ -943,7 +972,8 @@ def remove_border(image, top, bottom, left, right):
     return cropped
 
 def transform_coordinates(maldi_tl, maldi_tr, maldi_bl, maldi_br,
-                          template_tl, template_tr, template_bl, template_br):
+                          template_tl, template_tr, template_bl, 
+                          template_br, directory, sample_name, meth):
     """
     Print the transformation coordinates taking into account maldi TL is (0,0)
     """
@@ -951,6 +981,41 @@ def transform_coordinates(maldi_tl, maldi_tr, maldi_bl, maldi_br,
     maldi_tr_new = (maldi_tr[0] - maldi_tl[0], 0)
     maldi_bl_new = (0, maldi_bl[1] - maldi_tl[1])
     maldi_br_new = (maldi_br[0] - maldi_bl[0], maldi_br[1] - maldi_tr[1])
-    # template_tl_
-    print("Transformation Coordinates:")
+
+    template_tl_new = (template_tl[0] - maldi_tl[0], template_tl[1] - maldi_tl[1])
+    template_tr_new = (template_tr[0] - maldi_tl[0], template_tr[1] - maldi_tl[1])
+    template_bl_new = (template_bl[0] - maldi_tl[0], template_bl[1] - maldi_tl[1])
+    template_br_new = (template_br[0] - maldi_tl[0], template_br[1] - maldi_tl[1])
+
+    # print("MALDI Coordinates (relative to TL as 0,0):")
+    # print(f" Top Left: {maldi_tl_new}")
+    # print(f" Top Right: {maldi_tr_new}")
+    # print(f" Bottom Left: {maldi_bl_new}")
+    # print(f" Bottom Right: {maldi_br_new}")
+    # print("")
+    # print("Template Coordinates (relative to MALDI TL as 0,0):")
+    # print(f" Top Left: {template_tl_new} blue")
+    # print(f" Top Right: {template_tr_new} green")
+    # print(f" Bottom Left: {template_bl_new} yellow")
+    # print(f" Bottom Right: {template_br_new} black")
+    
+    os.makedirs(f"{directory}/outputs/{sample_name}/coordinates", exist_ok=True)
+    txt_path_maldi = f"{directory}/outputs/{sample_name}/coordinates/{sample_name}_{meth}_MALDI.txt"
+    txt_path_qupath = f"{directory}/outputs/{sample_name}/coordinates/{sample_name}_{meth}_QUPATH.txt"
+
+    with open(txt_path_maldi, 'w') as f:
+        f.write(f"TL {maldi_tl_new[0]} {maldi_tl_new[1]}\n")
+        f.write(f"TR {maldi_tr_new[0]} {maldi_tr_new[1]}\n")
+        f.write(f"BL {maldi_bl_new[0]} {maldi_bl_new[1]}\n")
+        f.write(f"BR {maldi_br_new[0]} {maldi_br_new[1]}\n")
+    f.close()
+    with open(txt_path_qupath, 'w') as f:
+        f.write(f"TL {template_tl_new[0]} {template_tl_new[1]}\n")
+        f.write(f"TR {template_tr_new[0]} {template_tr_new[1]}\n")
+        f.write(f"BL {template_bl_new[0]} {template_bl_new[1]}\n")
+        f.write(f"BR {template_br_new[0]} {template_br_new[1]}\n")
+    f.close()
+
+
+    
  
