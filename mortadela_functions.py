@@ -238,9 +238,9 @@ def process_images(sample_name, directory, template_pixel_size, maldi_pixel_size
 
 
     maldi_o = fused_image.copy()
-    # plt.imshow(maldi_o, cmap='gray')
-    # plt.axis('off')
-    # plt.show()
+    plt.imshow(maldi_o, cmap='gray')
+    plt.axis('off')
+    plt.show()
     # exit(1)
 
     # _, maldi_o = cv2.threshold(maldi_o.copy(), 0, 255, cv2.THRESH_OTSU)
@@ -791,26 +791,55 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
 
         # print("la bona")
         maldi = maldi_o.copy()
-        template_BW = cv2.flip(template_BW.copy(), 1) if flip else template_BW.copy()
-        # remove_border(template_with_overlay1, biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2)
-        template_BW = rotate_image(template_BW.copy(), -angle)
 
-        
-        template = rotate_image(template.copy(), angle)
-        template = cv2.flip(template.copy(), 1) if flip else template.copy()
         maldi[maldi == 0] = 255
+        print("Starting super fine tuning...")
+        print(f"Initial resize: {resize}")
+        final_resize_table = []
+        min_resize = resize - 0.02
+        max_resize = resize + 0.02
+        if min_resize <= 0:
+            min_resize = 0.05
 
-        res = cv2.matchTemplate( template_BW.copy(), maldi.copy(), method)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
+        for resize_final in np.arange(min_resize, max_resize, 0.005):
+            # template_resized = cv2.resize(template.copy(), (0, 0), fx=resize_final, fy=resize_final)
+            template_BW_resized = cv2.resize(template_BW_original.copy(), (0, 0), fx=resize_final, fy=resize_final)
+            template_BW_resized = cv2.copyMakeBorder(template_BW_resized.copy(), biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2, cv2.BORDER_CONSTANT, value=255)
+            template_BW_resized = rotate_image(template_BW_resized.copy(), angle)
+            template_BW_resized = cv2.flip(template_BW_resized.copy(), 1) if flip else template_BW_resized.copy()
 
+            if template_BW_resized.shape[0] < maldi.shape[0] or template_BW_resized.shape[1] < maldi.shape[1]:
+                continue
+            # template_with_overlay2 = overlay_images_alpha(template_resized.copy(), maldi.copy(), overlay_loc, 0.7)
+            
+            res = cv2.matchTemplate(maldi.copy(), template_BW_resized.copy(), method)
+            min_val, max_val, min_loc, max_loc  = cv2.minMaxLoc(res)
+            
+            if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
+                final_resize_table.append((min_val, resize_final, min_loc))
+            else:            
+                # print(f"max val: {max_val}, max_loc: {max_loc} for resize_final: {resize_final}")
+                final_resize_table.append((max_val, resize_final, max_loc))
         if method in [cv2.TM_SQDIFF, cv2.TM_SQDIFF_NORMED]:
-            overlay_loc = min_loc
+            max_val, resize, location = min(final_resize_table, key=lambda x: x[0])
         else:
-            overlay_loc = max_loc
+            max_val, resize, location = max(final_resize_table, key=lambda x: x[0])
+
+
+        overlay_loc = location
+        print(f"Final resize: {resize}")
+        print(f"Final location: {overlay_loc}")
+
+        template = cv2.resize(template_original.copy(), (0, 0), fx=resize, fy=resize)
+        template = cv2.copyMakeBorder(template.copy(), biggest_add//2, biggest_add//2, biggest_add//2, biggest_add//2, cv2.BORDER_CONSTANT, value=255)
+ 
+        template = rotate_image(template.copy(), angle)
+
+        template = cv2.flip(template.copy(), 1) if flip else template.copy()
+ 
         template_with_overlay2 = overlay_images_alpha(template.copy(), maldi.copy(), overlay_loc, 0.7)
 
         
-
         # plt.plot(overlay_loc[0], overlay_loc[1], 'ro')  #maldi top left
         # plt.plot(overlay_loc[0] + maldi.shape[1], overlay_loc[1], 'ro')  #
         # plt.plot(overlay_loc[0], overlay_loc[1] + maldi.shape[0], 'ro')  #
@@ -834,7 +863,7 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
         plt.plot(overlay_loc[0], overlay_loc[1] + maldi.shape[0], 'ro')  #
         plt.plot(overlay_loc[0] + maldi.shape[1], overlay_loc[1] + maldi.shape[0], 'ro')
 
-        plt.plot(template_tl_o[0], template_tl_o[1], 'bo')  #template top left
+        plt.plot(template_tl_o[0], template_tl_o[1], 'wo')  #template top left
         plt.plot(template_tr_o[0], template_tr_o[1], 'go')  #template top right
         plt.plot(template_bl_o[0], template_bl_o[1], 'yo')  #template bottom left
         plt.plot(template_br_o[0], template_br_o[1], 'ko')  #template bottom right
@@ -861,7 +890,7 @@ def match_and_overlay_gif_and_png(template_original, template_BW_original, maldi
 
 
 
-        exit(0)
+        # exit(0)
 
 
 # def rotate_point_manual(x, y, center_x, center_y, angle_degrees, scale=1.0):
